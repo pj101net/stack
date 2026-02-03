@@ -1,0 +1,74 @@
+services:
+  metube:
+    image: ghcr.io/alexta69/metube:latest
+    ports:
+      - "4001:8081"
+    networks:
+      - project
+    volumes:
+      - ./metube:/downloads
+
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "4002:8080"
+    networks:
+      - project
+    volumes:
+      - ./searxng:/etc/searxng
+
+  archivebox:
+    image: archivebox/archivebox:latest
+    ports:
+      - "4003:8000"
+    networks:
+      - project
+    volumes:
+      - ./archivebox:/data
+    environment:
+      ALLOWED_HOSTS: "*"
+      PUBLIC_INDEX: "True"
+      ADMIN_USER: "admin"
+      ADMIN_PASS: "admin"
+
+  obsidian:
+    image: ghcr.io/sytone/obsidian-remote:latest
+    ports:
+      - "4004:8080"
+    networks:
+      - project
+    volumes:
+      - ./obsidian:/vaults
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Sydney
+
+  firefox:
+    image: jlesage/firefox:latest
+    ports:
+      - "4005:5800"
+    networks:
+      - project
+    volumes:
+      - ./firefox:/config
+    environment:
+      # Preload extensions and themes from the local extensions folder
+      EXTENSIONS_DIR: "/config/extensions"
+
+  heimdall:
+    image: linuxserver/heimdall:latest
+    ports:
+      - "4000:80"
+    networks:
+      - project
+    volumes:
+      - ./heimdall:/config
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Australia/Sydney
+
+networks:
+  project:
+    driver: bridge
